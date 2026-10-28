@@ -63,6 +63,23 @@ namespace AngleSharp.Core.Tests.Css
         }
 
         [Test]
+        public void ParseSelector_WithKnownPseudoElementsThatDrawNoBox_ReturnsSelector()
+        {
+            var parser = new CssSelectorParser();
+
+            // The names the engine knows the shape of but paints nothing for. A page asking
+            // `@supports selector(input::placeholder)` is asking whether the name is readable, which
+            // is the same question these selectors answer (CSS Pseudo 4 §4.5, CSS Forms 4 §4.2).
+            foreach (var written in new[] { "input::placeholder", "::file-selector-button", "::details-content", "input::-webkit-slider-thumb" })
+            {
+                var selector = parser.ParseSelector(written);
+
+                Assert.NotNull(selector, written);
+                Assert.AreEqual(written, selector!.Text);
+            }
+        }
+
+        [Test]
         public void ParseSelector_WithCaseInsensitiveAttributeValue_KeepsModifierInText()
         {
             var parser = new CssSelectorParser();
