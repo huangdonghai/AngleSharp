@@ -359,43 +359,82 @@ namespace AngleSharp.Dom
         /// <returns>True if the element is currently in its default state, otherwise false.</returns>
         public static Boolean IsDefault(this IElement element)
         {
+            // `:default` does not name an element that happens to be switched on; it names the one a group
+            // of siblings offers when nothing was chosen: a checkbox or radio box the author marked checked,
+            // an option the author marked selected, and a form's default button - the first element in it,
+            // in tree order, that submits the form (Selectors 4 §8.1 with HTML §4.10.13). Measured in
+            // Chrome over the gecko 348809 family: a second submit button is left out however it is marked,
+            // a disabled first one is still the default, a reset or plain button never submits a form and so
+            // is never it, and an attribute written with no value counts as written.
             if (element is IHtmlButtonElement buttonElement)
             {
-                var form = buttonElement.Form;
-
-                //TODO Check if button is form def. button
-                if (form != null)
-                {
-                    return true;
-                }
+                return buttonElement.Type == InputTypeNames.Submit &&
+                    IsDefaultButton(element, buttonElement.Form);
             }
             else if (element is IHtmlInputElement inputElement)
             {
                 var type = inputElement.Type;
 
+                if (type.IsOneOf(InputTypeNames.Checkbox, InputTypeNames.Radio))
+                {
+                    return inputElement.HasAttribute(AttributeNames.Checked);
+                }
+
                 if (type.IsOneOf(InputTypeNames.Submit, InputTypeNames.Image))
                 {
-                    var form = inputElement.Form;
-
-                    //TODO Check if input is form def. button
-                    if (form != null)
-                    {
-                        return true;
-                    }
-                }
-                else
-                {
-                    //TODO input that are checked and can be checked ...
+                    return IsDefaultButton(element, inputElement.Form);
                 }
             }
             else if (element is IHtmlOptionElement)
             {
-                var value = element.GetAttribute(null, AttributeNames.Selected);
-                return !String.IsNullOrEmpty(value);
+                return element.HasAttribute(AttributeNames.Selected);
             }
 
             return false;
         }
+
+        /// <summary>
+        /// Checks whether the element is the first one in its form that submits that form, which is the
+        /// form's default button.
+        /// </summary>
+        private static Boolean IsDefaultButton(IElement element, IHtmlFormElement? form)
+        {
+            if (form is null)
+            {
+                return false;
+            }
+
+            // The form's own tree, walked in the order the document states it: the default button is the
+            // first element that submits the form, wherever it sits - inside a fieldset as much as not.
+            foreach (var candidate in DescendantElements(form))
+            {
+                if (SubmitsForm(candidate))
+                {
+                    return ReferenceEquals(candidate, element);
+                }
+            }
+
+            return false;
+        }
+
+        private static IEnumerable<IElement> DescendantElements(IElement parent)
+        {
+            foreach (var child in parent.Children)
+            {
+                yield return child;
+
+                foreach (var descendant in DescendantElements(child))
+                {
+                    yield return descendant;
+                }
+            }
+        }
+
+        private static Boolean SubmitsForm(IElement element) =>
+            element is IHtmlInputElement input
+                ? input.Type.IsOneOf(InputTypeNames.Submit, InputTypeNames.Image)
+                : element is IHtmlButtonElement button
+                    && button.Type == InputTypeNames.Submit;
 
         /// <summary>
         /// Checks if the element is a pseudo element (before or after).
