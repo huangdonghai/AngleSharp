@@ -22,6 +22,15 @@ namespace AngleSharp.Css
             { PseudoElementNames.Content, CreateUnsupportedPseudoElementSelector(PseudoElementNames.Content) },
             { PseudoElementNames.Checkmark, CreatePseudoElementSelector(PseudoElementNames.Checkmark) },
             { PseudoElementNames.PickerIcon, CreatePseudoElementSelector(PseudoElementNames.PickerIcon) },
+            // A pseudo-element the engine knows the name of but draws nothing for. Registering it is
+            // what lets `@supports selector(::placeholder)` answer yes, which is the question the page
+            // is really asking; a rule that styles one still matches nothing (CSS Conditional 4 §3.1).
+            { PseudoElementNames.Placeholder, CreateUnsupportedPseudoElementSelector(PseudoElementNames.Placeholder) },
+            { PseudoElementNames.FileSelectorButton, CreateUnsupportedPseudoElementSelector(PseudoElementNames.FileSelectorButton) },
+            { PseudoElementNames.FileUploadButton, CreateUnsupportedPseudoElementSelector(PseudoElementNames.FileUploadButton) },
+            { PseudoElementNames.DetailsContent, CreateUnsupportedPseudoElementSelector(PseudoElementNames.DetailsContent) },
+            { PseudoElementNames.SliderThumb, CreateUnsupportedPseudoElementSelector(PseudoElementNames.SliderThumb) },
+            { PseudoElementNames.SliderRunnableTrack, CreateUnsupportedPseudoElementSelector(PseudoElementNames.SliderRunnableTrack) },
         };
 
         private static ISelector CreatePseudoElementSelector(String name) => new PseudoElementSelector(el => el.IsPseudo(name), name);

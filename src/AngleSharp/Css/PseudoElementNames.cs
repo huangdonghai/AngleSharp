@@ -68,6 +68,36 @@ namespace AngleSharp.Css
         public static readonly String Picker = "picker";
 
         /// <summary>
+        /// The placeholder pseudo element of a form control (CSS Pseudo 4 §4.5).
+        /// </summary>
+        public static readonly String Placeholder = "placeholder";
+
+        /// <summary>
+        /// The <c>::file-selector-button</c> pseudo element (CSS Forms 1 §4.2).
+        /// </summary>
+        public static readonly String FileSelectorButton = "file-selector-button";
+
+        /// <summary>
+        /// The <c>::details-content</c> pseudo element (CSS Pseudo 4 §4.8).
+        /// </summary>
+        public static readonly String DetailsContent = "details-content";
+
+        /// <summary>
+        /// The slider thumb of a range input, as the vendor spelling names it.
+        /// </summary>
+        public static readonly String SliderThumb = "-webkit-slider-thumb";
+
+        /// <summary>
+        /// The track a range input's thumb runs along, as the vendor spelling names it.
+        /// </summary>
+        public static readonly String SliderRunnableTrack = "-webkit-slider-runnable-track";
+
+        /// <summary>
+        /// The file upload button's vendor spelling, which is the old name of the same box.
+        /// </summary>
+        public static readonly String FileUploadButton = "-webkit-file-upload-button";
+
+        /// <summary>
         /// The separating double-colon.
         /// </summary>
         public static readonly String Separator = "::";
